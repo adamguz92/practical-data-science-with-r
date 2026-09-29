@@ -409,4 +409,39 @@ bball %>%
   select(Player, Age, posTeam) %>% 
   arrange(desc(Age))
 
-### 1.5.4 Genereting New Data ----
+### 1.5.4 Genereting New Data - funkcja mutate(), across() ----
+bball = bball %>% 
+  mutate(
+    trueShooting = PTS / (2* (FGA + (.44 * FTA))),
+    effectiveFG = (FG + (.5 * X3P)) / FGA,
+    shootingDif = trueShooting - FG
+    ) 
+
+bball %>% 
+  select(trueShooting) %>% 
+  summary()
+
+### 1.5.5 Grouping and Summarizing Data ---
+bball = bball %>% 
+  mutate(
+    trueShooting = PTS / (2* (FGA + (.44 * FTA))),
+    effectiveFG = (FG + (.5 * X3P)) / FGA,
+    shootingDif = trueShooting - FG
+  ) %>% 
+  group_by(Pos) %>% 
+  summarize('Mean True Shooting' = mean(trueShooting - FG, na.rm = TRUE))
+
+# Łatwy przykład z użyciem funkcji group_by()
+sales <- data.frame(
+  sklep = c("A", "B", "B", "B", "A"),
+  sprzedaz = c(100, 200, 150, 250, 200)
+)
+
+sales
+
+sales %>% 
+  select(sklep, sprzedaz) %>% 
+  group_by(sklep) %>% 
+  summarise(srednia = mean(sprzedaz)) # Potraktuj każdy sklep jako osobną grupę.
+
+
