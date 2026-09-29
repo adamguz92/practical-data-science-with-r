@@ -444,4 +444,38 @@ sales %>%
   group_by(sklep) %>% 
   summarise(srednia = mean(sprzedaz)) # Potraktuj każdy sklep jako osobną grupę.
 
+# nycflights13 data set
+install.packages('nycflights13')
+library(nycflights13)
+
+flights <- data.frame('flights' = nycflights13::flights) # Nie muszę tego robić. 
+# Wystarczy odczytać dokumentacje biblioteki nycflights13 i wywołać konkretna zmienną. Tak jak poniżej:
+
+View(planes)
+
+# Wielkosć grupy
+carriers = group_by(nycflights13::flights, carrier)
+View(carriers)
+
+group_size(carriers) # wielkość grupy
+
+View(flights)
+
+# Grupowanie w bibliotece nycflights13
+flights %>% 
+  group_by(flights.carrier) %>% 
+  summarise(mean_air_time = mean(flights.air_time, na.rm = TRUE),
+            sd_air_time = sd(flights.air_time, na.rm = TRUE))
+# Jeżeli nie odrzucę pustych wartości to kolumna mean_air_time będzie pusta.
+
+#### 1.5.4.1 Grupowanie za pomocą funkcji nest_by() ----
+# Funkcja nest_by() tworzy grupy i do każdej przypisuje odzielny tibble z informacjami.
+
+flights %>% 
+  nest_by(flights.carrier) %>% 
+  mutate(mean_air_time = mean(data$flights.air_time, na.rm = TRUE),
+         sd_air_time = sd(data$flights.air_time, na.rm = TRUE))
+
+### 1.5.5 Renaming Columns ----
+
 
