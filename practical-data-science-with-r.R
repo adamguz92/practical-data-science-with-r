@@ -337,5 +337,76 @@ mydf %>%
   lm(dist ~ speed, data = .) # działa
 
 ## 1.5 Tidyverse ----
+# Warto do tego wrócić.
+library(tidyverse)
+
+# Key operations
+# select
+# filter
+# group_by
+# mutate
+# summarize
+# inner_join
+# left_join
+
+### 1.5.1 Web scraping ----
+library(rvest) # Pakiet rvest służy do pobierania i przetwarzania zawartości stron internetowych 
+
+current_year = lubridate::year(Sys.Date()) # rok
+
+url = glue::glue("http://www.basketball-reference.com/leagues/NBA_{current_year-1}_totals.html") # Funkcja glue() z pakietu glue pozwalać pobrać wartości zmiennych i wyniki wyrażeń bezpośrednio do tekstu.
+
+bball = read_html(url) %>% # Pobierz zawartość strony HTML ze zmiennej url.
+  html_nodes("#totals_stats") %>% # selekcjoner CSS # Znajdź element HTML, którego id wyosi totals_stats.
+  html_table() %>% # Przekształca tabelę HTML w strukturę danych R.
+  data.frame() 
 
 
+save(bball, file='/Users/adamguz/Desktop/bball.RData') # Zapisz na dysku jako...
+
+View(bball)
+
+str(bball)
+
+### 1.5.2 Selecting columns - funkcja select() ----
+library(tidyverse)
+bball %>% 
+  select(Player, Team, Pos) %>% 
+  head()
+
+#### 1.5.2.1 Droping variables - funkcja select(-zmienna) ----
+bball %>% 
+  select(-Player, -Team, -Pos) %>% 
+  head()
+
+#### 1.5.2.1 Helper functions (contains(), ends_with()), funckja arrange() ----
+bball %>% 
+  select(Player, contains('3P'), ends_with('RB')) %>% 
+  arrange(desc(TRB)) %>% 
+  head()
+
+# Inne helper functions
+# starts_with: starts with a prefix
+# ends_with: ends with a suffix
+# contains: contains a literal string
+# matches: matches a regular expression
+# num_range: a numerical range like x01, x02, x03.
+# one_of: variables in character vector.
+# everything: all variables.
+
+### 1.5.3 Filtering Rows - funkcje filter(), distinct(), unite() ----
+bball %>% 
+  filter(Age > 35, Pos == 'SF' | Pos == 'PF') %>% 
+  distinct(Player, Pos, Age) # usuwa duplikaty
+
+bball %>% 
+  select(Player, Age, Team) %>% 
+  slice(1:5) # Pokaże pierwszych 5 rekordów.
+
+bball %>% 
+  unite('posTeam', sep = '_', Pos, Team) %>% # Funkcja unite() łączy ze soba dwie kolumny za pomocą wybranego separatora.
+  filter(posTeam == 'SG_GSW') %>% 
+  select(Player, Age, posTeam) %>% 
+  arrange(desc(Age))
+
+### 1.5.4 Genereting New Data ----
